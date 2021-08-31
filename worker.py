@@ -1,9 +1,9 @@
 import copy
-import helper
 import threading
 
 class Worker:
-    def __init__(self, board, legalMoves, playerOnPlay = 1, evaluation=0, lastMove=None):
+    def __init__(self, helper, board, legalMoves, playerOnPlay = 1, evaluation=0, lastMove=None):
+        self.helper = helper
         self.board = copy.copy(board)
         self.legalMoves = copy.copy(legalMoves)
         self.evaluation = {"evaluation": evaluation, "move": lastMove, "kids": {}, "sortedKids": []}
@@ -18,7 +18,7 @@ class Worker:
     def _createNode(self, move):
         currentEval = self.getCurrentEvaluation()
         currentEval["sortedKids"].append(move)
-        currentEval["kids"][helper.getArrayHash(move)] = {"evaluation": -currentEval["evaluation"], "move": move, "kids": {}, "sortedKids": []}
+        currentEval["kids"][self.helper.getArrayHash(move)] = {"evaluation": -currentEval["evaluation"], "move": move, "kids": {}, "sortedKids": []}
     
     def playMove(self, move):
         if self.lock:
@@ -38,13 +38,13 @@ class Worker:
         #go level up
         if move == "..":
             lastMove = self.moves.pop()
-            helper.setField(self.board, lastMove, 0)
+            self.helper.setField(self.board, lastMove, 0)
             self.legalMoves.append(lastMove)
             
         #go deeper
         else:
             self.moves.append(move)
-            helper.setField(self.board, move, self.playerOnPlay)
+            self.helper.setField(self.board, move, self.playerOnPlay)
             self.legalMoves.remove(move)
 
         #always change who's on play
@@ -56,7 +56,7 @@ class Worker:
         """
         #TODO use real evaluation
         currentEval = self.getCurrentEvaluation()
-        currentEval["evaluation"] += helper.evaluateMove(self.board, currentEval["move"], self.playerOnPlay)
+        currentEval["evaluation"] += self.helper.evaluateMove(self.board, currentEval["move"], self.playerOnPlay)
         
     def _work(self):
         """
@@ -90,7 +90,7 @@ class Worker:
         """
         current = self.evaluation
         for move in self.moves:
-            current = current["kids"][helper.getArrayHash(move)]
+            current = current["kids"][self.helper.getArrayHash(move)]
         return current
         
     def _sortCurrentKidsAndChangeEval(self):
@@ -103,13 +103,13 @@ class Worker:
         currentEval = self.getCurrentEvaluation()
         
         def sortHelper(move):
-            return currentEval["kids"][helper.getArrayHash(move)]["evaluation"]
+            return currentEval["kids"][self.helper.getArrayHash(move)]["evaluation"]
             
         #minimalize the opponent's advantage after our move
         currentEval["sortedKids"].sort(reverse = False, key = sortHelper)
        
         	#the better the position is for our opponent, the worse it os for us
-        currentEval["evaluation"] = -1 * currentEval["kids"][helper.getArrayHash(currentEval["sortedKids"][0])]["evaluation"]
+        currentEval["evaluation"] = -1 * currentEval["kids"][self.helper.getArrayHash(currentEval["sortedKids"][0])]["evaluation"]
         
     def _prepareLevel(self):
         """

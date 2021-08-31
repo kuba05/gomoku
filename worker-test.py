@@ -1,10 +1,12 @@
 from worker import Worker
 import code
 import time
+from helper import Helper
 
+helper = Helper()
 field = [[0 for i in range(15)] for j in range(15)]
 moves = [[i,j] for i in range(15) for j in range(15)]
-w = Worker(field, moves, 10)
+w = Worker(helper, field, moves, 10)
 
 e = w.getCurrentEvaluation
 
@@ -26,4 +28,3 @@ time.sleep(2)
 stop()
 
 code.interact(local = locals())
-

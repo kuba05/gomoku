@@ -1,11 +1,22 @@
 from worker import Worker
+from helper import Helper
+
+import time
+
+"""
+Constants. Feel free to overwrite them!
+"""
 
 BOARD_SIZE = 15
-STARTING_LETTER = 'A'
+STARTING_LETTER = 'a'
+CALCULATE_SPEED = True
 
-board = [[0 for i in range(BOARD_SIZE)] for j in range(BOARD_SIZE)]
-legalMoves = [[i,j] for i in range(BOARD_SIZE) for j in range(BOARD_SIZE)]
-worker = Worker(board, legalMoves)
+
+
+
+#creating worker
+helper = Helper(gatherData = CALCULATE_SPEED)
+worker = Worker(helper, [[0 for i in range(BOARD_SIZE)] for j in range(BOARD_SIZE)], [[i,j] for i in range(BOARD_SIZE) for j in range(BOARD_SIZE)])
 
 def parseFromLetter(letter):
     """
@@ -21,6 +32,10 @@ def parseToLetter(number):
     
     
 def playMove():
+    
+    if CALCULATE_SPEED:
+        startingTime = time.time()
+        startingNodes = helper.getNodes()
     #start computing the move
     worker.startWorking()
     
@@ -36,7 +51,11 @@ def playMove():
     #play the move()
     worker.playMove(move)
     worker.stopWorking()
-
+    
+    if CALCULATE_SPEED:
+        t = time.time()-startingTime
+        nodes = helper.getNodes() - startingNodes
+        print(nodes/t, "nodes/s")
 
 def readMove():
     """

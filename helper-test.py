@@ -1,18 +1,24 @@
-import helper
+from helper import Helper
+
+helper = Helper()
+
 def testHashes():
     h = helper.getArrayHash
 
     allHashes = []
 
+    good = True
+    
     a = [[i,j] for i in range(15) for j in range(15)]
     print(len(a))
     for array in a:
         x=h(array)
         if x in allHashes:
             print("error")
+            good = False
         allHashes.append(x)
     
-    print("x")
+    print(good)
 
 def testEval():
     board = [[0 for i in range(15)] for j in range(15)]
@@ -31,6 +37,7 @@ def testThreatEval():
     
     print(good)
     
+testHashes()
 testThreatEval()
 
 testEval()
