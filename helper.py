@@ -81,7 +81,7 @@ class Helper:
         if numberOfFreeEnds == 0:
             evaluation = 0
         elif isThePlayerOnPlay:
-            evaluation = 10**(lengthOfThreat + numberOfFreeEnds + 1)
+            evaluation = 10**(lengthOfThreat + numberOfFreeEnds)
         else:
             evaluation = - 10**(lengthOfThreat + numberOfFreeEnds)
         return evaluation
